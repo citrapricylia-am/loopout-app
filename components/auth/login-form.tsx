@@ -48,7 +48,6 @@ export function LoginForm({ onLogin }: LoginFormProps) {
         Login
       </Button>
       <div className="text-sm text-center text-gray-600 dark:text-gray-400">
-        Demo: admin@company.com or john@company.com (any password)
       </div>
     </form>
   )

@@ -69,9 +69,11 @@ export function RegisterForm({ onRegister }: RegisterFormProps) {
             <SelectItem value="IT">IT</SelectItem>
             <SelectItem value="HR">HR</SelectItem>
             <SelectItem value="Finance">Finance</SelectItem>
-            <SelectItem value="Marketing">Marketing</SelectItem>
-            <SelectItem value="Operations">Operations</SelectItem>
-            <SelectItem value="Sales">Sales</SelectItem>
+            <SelectItem value="Sustainable_Agriculture_Program">Sustainable Agriculture Program</SelectItem>
+            <SelectItem value="RFN_Program">RFN Program</SelectItem>
+            <SelectItem value="Green_Development_Program">Green Development Program</SelectItem>
+            <SelectItem value="Community_Based_Bioenergy_Program">Community Based Bioenergy Program</SelectItem>
+            <SelectItem value="Operations">Operation</SelectItem>
           </SelectContent>
         </Select>
       </div>
