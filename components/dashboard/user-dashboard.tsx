@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -27,9 +27,103 @@ interface UserDashboardProps {
   onUpdateTicket: (ticketId: string, updates: Partial<Ticket>) => Promise<void>
 }
 
-export function UserDashboard({ user, tickets, onCreateTicket, onUpdateTicket }: UserDashboardProps) {
+export function UserDashboard({ user, tickets: initialTickets, onCreateTicket, onUpdateTicket }: UserDashboardProps) {
+  const [tickets, setTickets] = useState<Ticket[]>(initialTickets)
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null)
+
+  // ✅ Fetch tickets from API when component mounts
+  useEffect(() => {
+    const fetchTickets = async () => {
+      try {
+        const response = await fetch(`/api/tickets?userId=${user.id}`);
+        if (!response.ok) {
+          throw new Error('Gagal memuat tiket');
+        }
+        const data = await response.json();
+        
+        // Map the data to match our Ticket interface
+        const mappedTickets = data.map((t: any) => ({
+          id: t.id,
+          title: t.title,
+          shortDescription: t.short_description,
+          detailRequest: t.detail_request,
+          requestType: t.request_type,
+          bugUrl: t.bug_url,
+          websiteTitle: t.website_title,
+          priority: t.priority,
+          status: t.status,
+          userId: t.user_id,
+          userName: t.userName,
+          userEmail: t.userEmail,
+          userPhone: t.userPhone,
+          userDepartment: t.userDepartment,
+          createdAt: t.created_at,
+          updatedAt: t.updated_at,
+          deadline: t.deadline ?? null,
+        }));
+        
+        setTickets(mappedTickets);
+      } catch (error) {
+        console.error('Error fetching tickets:', error);
+      }
+    };
+
+    fetchTickets();
+  }, [user.id]);
+
+  // ✅ Listen for localStorage changes to refresh tickets
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'tickets:invalidate') {
+        // Refresh tickets when notified
+        const fetchTickets = async () => {
+          try {
+            const response = await fetch(`/api/tickets?userId=${user.id}`);
+            if (!response.ok) {
+              throw new Error('Gagal memuat tiket');
+            }
+            const data = await response.json();
+            
+            // Map the data to match our Ticket interface
+            const mappedTickets = data.map((t: any) => ({
+              id: t.id,
+              title: t.title,
+              shortDescription: t.short_description,
+              detailRequest: t.detail_request,
+              requestType: t.request_type,
+              bugUrl: t.bug_url,
+              websiteTitle: t.website_title,
+              priority: t.priority,
+              status: t.status,
+              userId: t.user_id,
+              userName: t.userName,
+              userEmail: t.userEmail,
+              userPhone: t.userPhone,
+              userDepartment: t.userDepartment,
+              createdAt: t.created_at,
+              updatedAt: t.updated_at,
+              deadline: t.deadline ?? null,
+            }));
+            
+            setTickets(mappedTickets);
+          } catch (error) {
+            console.error('Error fetching tickets:', error);
+          }
+        };
+
+        fetchTickets();
+      }
+    };
+
+    // Add event listener for storage changes
+    window.addEventListener('storage', handleStorageChange);
+
+    // Cleanup function to remove event listener
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [user.id]);
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {

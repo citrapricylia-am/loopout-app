@@ -297,7 +297,7 @@ const refreshTickets = async (userId?: string, role?: string) => {
         ) : (
           <UserDashboard
             user={currentUser!}
-            tickets={tickets.filter((ticket) => ticket.userId === currentUser!.id)}
+            tickets={[]} // UserDashboard will fetch its own tickets
             onCreateTicket={handleCreateTicket}
             onUpdateTicket={updateTicket}
           />

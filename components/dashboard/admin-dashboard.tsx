@@ -41,6 +41,34 @@ export function AdminDashboard({ tickets, users, onUpdateTicket, onDeleteTicket 
     sendNotification(ticket, newStatus)
   }
 
+  // ✅ New function to handle ticket deletion
+  const handleDeleteTicket = async (ticketId: string) => {
+    try {
+      const response = await fetch(`/api/tickets/${ticketId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Gagal menghapus tiket');
+      }
+
+      // Update local state to remove the ticket
+      onDeleteTicket(ticketId);
+      
+      // Notify other components via localStorage
+      localStorage.setItem('tickets:invalidate', Date.now().toString());
+      
+      // Clean up the localStorage key after a short delay
+      setTimeout(() => {
+        localStorage.removeItem('tickets:invalidate');
+      }, 1000);
+    } catch (error) {
+      console.error('Error deleting ticket:', error);
+      alert('Gagal menghapus tiket: ' + (error as Error).message);
+    }
+  }
+
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "urgent":
@@ -217,7 +245,7 @@ export function AdminDashboard({ tickets, users, onUpdateTicket, onDeleteTicket 
                   <Button
                     variant="destructive"
                     size="sm"
-                    onClick={() => onDeleteTicket(ticket.id)}
+                    onClick={() => handleDeleteTicket(ticket.id)}
                   >
                     Hapus
                   </Button>
